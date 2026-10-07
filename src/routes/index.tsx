@@ -1,21 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-// // import { Switch } from '#/components/ui/switch'
-// import { Button } from '#/components/ui/button'
-
-
-
-export const Route = createFileRoute('/')({ component: Home })
-
-// function Home() {
-//   return (
-//     <div className="p-8">
-//       {/* <Switch /> */}
-//       <Button>Click me</Button>
-//     </div>
-//   )
-// }
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Moon, Sun } from "lucide-react";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -26,6 +11,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+export const Route = createFileRoute("/")({ component: Home });
 
 /* ---------- demo data ---------- */
 
@@ -87,7 +74,7 @@ function Face({ s }: { s: Slide }) {
     );
   if (s.kind === "chart")
     return (
-      <div className={base + "bg-white text-[var(--ink)]"}>
+      <div className={base + "bg-[var(--surface)] text-[var(--ink)]"}>
         <p className="absolute left-[7cqw] top-[7cqw] w-3/5 text-[5cqw] font-bold leading-tight">{s.title}</p>
         <div className="absolute inset-x-[7cqw] bottom-[7cqw] flex h-[42%] items-end gap-[2.5cqw]">
           {[28, 36, 41, 55, 78].map((h, i) => (
@@ -98,7 +85,7 @@ function Face({ s }: { s: Slide }) {
     );
   if (s.kind === "list")
     return (
-      <div className={base + "bg-white text-[var(--ink)]"}>
+      <div className={base + "bg-[var(--surface)] text-[var(--ink)]"}>
         <p className="absolute left-[7cqw] top-[7cqw] text-[5cqw] font-bold leading-tight">{s.title}</p>
         <ul className="absolute inset-x-[7cqw] bottom-[7cqw]">
           {s.items?.map((t) => (
@@ -163,6 +150,45 @@ function Demo({ deck, idx, setIdx }: { deck: string; idx: number; setIdx: (n: nu
   );
 }
 
+/* ---------- theme toggle ---------- */
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => setDark(document.documentElement.classList.contains("dark")), []);
+
+  const toggle = () => {
+    const next = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", next);
+    try {
+      localStorage.setItem("theme", next ? "dark" : "light");
+    } catch {}
+    setDark(next);
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggle}
+      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+      className="rounded-md border-[var(--ink)]/30 bg-transparent text-[var(--ink)] hover:bg-[var(--ink)]/10 hover:text-[var(--ink)] dark:border-[var(--ink)]/30 dark:bg-transparent dark:hover:bg-[var(--ink)]/10"
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={dark ? "sun" : "moon"}
+          className="grid place-items-center"
+          initial={{ rotate: -60, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          exit={{ rotate: 60, opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        </motion.span>
+      </AnimatePresence>
+    </Button>
+  );
+}
+
 /* ---------- page ---------- */
 
 const Line = ({ children, delay }: { children: string; delay: number }) => (
@@ -206,39 +232,14 @@ function Home() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap');
+:root{--paper:#EDF0F2;--surface:#FFFFFF;--ink:#12161C;--cobalt:#1F3FFF;--yellow:#FFD23F;--line:#C5CCD3;--muted:#4F5964}
+:root.dark{color-scheme:dark;--paper:#0E1217;--surface:#171C23;--ink:#ECEFF3;--cobalt:#4560FF;--line:#333B46;--muted:#9AA5B1}`}</style>
       <div
         className="min-h-screen bg-[var(--paper)] text-[var(--ink)] antialiased"
-        style={
-          {
-            fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
-            "--paper": "#EDF0F2",
-            "--ink": "#12161C",
-            "--cobalt": "#1F3FFF",
-            "--yellow": "#FFD23F",
-            "--line": "#C5CCD3",
-            "--muted": "#4F5964",
-          } as React.CSSProperties
-        }
+        style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}
       >
-        {/* nav */}
-        <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <a href="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
-            <span className="grid size-7 place-items-center rounded-[3px] bg-[var(--ink)] text-sm text-[var(--paper)]">D</span>
-            DeckForge
-          </a>
-          <nav className="hidden gap-8 text-[15px] md:flex">
-            <a href="#how" className="hover:underline underline-offset-4">How it works</a>
-            <a href="#features" className="hover:underline underline-offset-4">Features</a>
-            <a href="#faq" className="hover:underline underline-offset-4">FAQ</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <a href="/login" className="hidden text-[15px] hover:underline underline-offset-4 sm:block">Sign in</a>
-            <Button asChild size="sm" className="rounded-md bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--ink)]/85">
-              <a href="/signup">Start free</a>
-            </Button>
-          </div>
-        </header>
+        
 
         {/* hero */}
         <section className="mx-auto grid max-w-6xl items-center gap-14 px-6 pb-24 pt-12 lg:grid-cols-[5fr_7fr] lg:pt-20">
@@ -263,9 +264,9 @@ function Home() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 aria-label="What is your presentation about?"
-                className="h-12 rounded-md border-[var(--ink)]/30 bg-white text-base"
+                className="h-12 rounded-md border-[var(--ink)]/30 bg-[var(--surface)] text-base dark:bg-[var(--surface)]"
               />
-              <Button type="submit" className="h-12 rounded-md bg-[var(--yellow)] px-6 text-base font-semibold text-[var(--ink)] hover:bg-[var(--yellow)]/85">
+              <Button type="submit" className="h-12 rounded-md bg-[var(--yellow)] px-6 text-base font-semibold text-[#12161C] hover:bg-[var(--yellow)]/85">
                 Generate deck
               </Button>
             </form>
@@ -350,7 +351,7 @@ function Home() {
             <h2 className="max-w-[16ch] text-4xl font-extrabold leading-[1.02] tracking-[-0.025em] md:text-6xl">
               Your next deck is one sentence away
             </h2>
-            <Button asChild className="h-12 rounded-md bg-[var(--yellow)] px-8 text-base font-semibold text-[var(--ink)] hover:bg-[var(--yellow)]/85">
+            <Button asChild className="h-12 rounded-md bg-[var(--yellow)] px-8 text-base font-semibold text-[#12161C] hover:bg-[var(--yellow)]/85">
               <a href="/signup">Start free</a>
             </Button>
           </div>

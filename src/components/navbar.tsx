@@ -1,7 +1,7 @@
 import { authClient } from '#/lib/auth-client'
 import { cn } from '#/lib/utils'
 import { Link, useRouter } from '@tanstack/react-router'
-import { LogOut, Moon, Presentation, Sun, User } from 'lucide-react'
+import { LayoutDashboard, LogOut, Moon, Presentation, Sun, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Button } from './ui/button'
@@ -82,49 +82,57 @@ export default function Navbar() {
             {isPending ? (
               <div className="size-9 rounded-full bg-muted animate-pulse" />
             ) : session?.user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative size-9 rounded-full p-0"
+              <>
+                <Button asChild size="md" className="rounded-xl p-2">
+                  <Link to="/dashboard">
+                    {/* <LayoutDashboard className="size-4" /> */}
+                    Dashboard
+                  </Link>
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative size-9 rounded-full p-0"
+                    >
+                      <Avatar className="size-9 border-2 border-primary/30">
+                        <AvatarImage
+                          src={session.user.image}
+                          alt={session.user.name}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                          {session.user.name ? (
+                            session.user.name.charAt(0).toUpperCase()
+                          ) : (
+                            <User className="size-4" />
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 glass border-border/50"
                   >
-                    <Avatar className="size-9 border-2 border-primary/30">
-                      <AvatarImage
-                        src={session.user.image}
-                        alt={session.user.name}
-                      />
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {session.user.name ? (
-                          session.user.name.charAt(0).toUpperCase()
-                        ) : (
-                          <User className="size-4" />
-                        )}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 glass border-border/50"
-                >
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">{session.user.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {session.user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleSignOut}
-                    className="text-destructive focus:text-destructive cursor-pointer"
-                  >
-                    <LogOut className="mr-2 size-4" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col gap-1">
+                        <p className="text-sm font-medium">{session.user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {session.user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="text-destructive focus:text-destructive cursor-pointer"
+                    >
+                      <LogOut className="mr-2 size-4" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <Button asChild size="sm" className="rounded-xl">
                 <Link to="/login">Sign in</Link>
